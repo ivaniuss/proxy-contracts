@@ -2,55 +2,32 @@ const { expect } = require("chai");
 const { ethers, upgrades } = require("hardhat");
 
 describe("Beacon", function () {
-  it("deployments", async ()=> {
+  it.only("ship beacon", async () => {
     const [owner, addr1, addr2] = await ethers.getSigners();
     
-    const BeaconProxyPatternV1 = await ethers.getContractFactory("BeaconProxyPatternV1");
-    const beacon = await upgrades.deployBeacon(BeaconProxyPatternV1, {unsafeAllow: ['constructor']});
-    await beacon.deployed();
-    console.log(`Beacon with Beacon Proxy Pattern V1 as implementation is deployed to address: ${beacon.address}`);
-
-    const beaconProxy1 = await upgrades.deployBeaconProxy(beacon.address, BeaconProxyPatternV1, []);
-    let versionAwareContractName = await beaconProxy1.getContractNameWithVersion();
-    expect(versionAwareContractName).to.eq("Beacon Proxy Pattern: V1");
+    const ship = await (await ethers.getContractFactory("Ship")).deploy();
+    const shipFactory = await (await ethers.getContractFactory("ShipFactory")).deploy(ship.address);
+    const beacon = await shipFactory.getBeacon();
+    const shipBeacon = await (await ethers.getContractFactory("ShipBeacon"))
+                        .attach(beacon);
     
-    const beaconProxy2 = await upgrades.deployBeaconProxy(beacon.address, BeaconProxyPatternV1, []);
-    versionAwareContractName = await beaconProxy2.getContractNameWithVersion();
-    expect(versionAwareContractName).to.eq("Beacon Proxy Pattern: V1");
-    
-    const BeaconProxyPatternV2 = await ethers.getContractFactory("BeaconProxyPatternV2");
-    const upgradedBeacon = await upgrades.upgradeBeacon(beacon.address, BeaconProxyPatternV2, {unsafeAllow: ['constructor']});
-    console.log(`Beacon upgraded with Beacon Proxy Pattern V2 as implementation at address: ${upgradedBeacon.address}`);
-    versionAwareContractName = await beaconProxy1.getContractNameWithVersion();
-    expect(versionAwareContractName).to.eq("Beacon Proxy Pattern: V2");
+    await shipFactory.buildShip("ship1", 10, 1);
+    await shipFactory.buildShip("ship2", 1, 2);
 
-    versionAwareContractName = await beaconProxy2.getContractNameWithVersion();
-    console.log(`Proxy Pattern and Version from Proxy 2 Implementation: ${versionAwareContractName}`);
-    versionAwareContractName = await beaconProxy1.versionAwareContractName();
-    console.log(`Proxy Pattern and Version from Proxy 1 Storage: ${versionAwareContractName}`);
-    versionAwareContractName = await beaconProxy2.versionAwareContractName();
-    console.log(`Proxy Pattern and Version from Proxy 2 Storage: ${versionAwareContractName}`);
-    
-    const implementationAddress =  await beacon.implementation();
-    
-    const Factory = await ethers.getContractFactory("Factory");
-    const factory = await Factory.deploy(implementationAddress);
-    await factory.deployed();
+    const shipV2 = await (await ethers.getContractFactory("ShipV2")).deploy();
+    await shipBeacon.update(shipV2.address);
 
+    const shipIndex = await shipFactory.getShipAddress(1);
+    const updatedShip = await (await ethers.getContractFactory("ShipV2"))
+                        .attach(shipIndex);
+    await await updatedShip.refuel();
+    expect(await updatedShip.fuel()).to.be.eq(11);
 
-    const tx1 = await factory.createBeacon();
-    const addr = await tx1.wait()
-    const newBeacon = new ethers.Contract(
-      addr.events[1].args.contractAddress,
-      [
-        'function getContractNameWithVersion() public pure override returns (string memory)',
-      ],
-      addr1
-    );
-    expect(newBeacon.address).to.equal(addr.events[1].args.contractAddress)
-
-    console.log('version', await newBeacon.getContractNameWithVersion())
-
+    const shipIndex2 = await shipFactory.getShipAddress(2);
+    const updatedShip2 = await (await ethers.getContractFactory("ShipV2"))
+        .attach(shipIndex2);
+    await await updatedShip2.refuel();
+    expect(await updatedShip2.fuel()).to.be.eq(2);
   })
 
 });

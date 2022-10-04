@@ -2,13 +2,13 @@
   "manifestVersion": "3.2",
   "proxies": [
     {
-      "address": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
-      "txHash": "0x21185c0836e03ec29492254dc223bec277c191a6b4e95d682d9ed21807dc968b",
+      "address": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
+      "txHash": "0xaeb08daffeb56016f5ec992607107cbbac4560bcdd66876599dcd580f91d046f",
       "kind": "beacon"
     },
     {
-      "address": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
-      "txHash": "0xaeb08daffeb56016f5ec992607107cbbac4560bcdd66876599dcd580f91d046f",
+      "address": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+      "txHash": "0x21185c0836e03ec29492254dc223bec277c191a6b4e95d682d9ed21807dc968b",
       "kind": "beacon"
     }
   ],
@@ -62,7 +62,7 @@
     },
     "523d1bfb55d8138b180c004d10477a2ec4d23c71e88d9277e20d819cdfc4513d": {
       "address": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
-      "txHash": "0x371f305a2b79fdfb2f32f7ec36a77bf8453244eb788cb1fd2f282d3d01e1241e",
+      "txHash": "0x01c96adbf7ae27639dd93167cfd69fbccdc5a8a9c0d99195cddde9d88828cab6",
       "layout": {
         "storage": [
           {
